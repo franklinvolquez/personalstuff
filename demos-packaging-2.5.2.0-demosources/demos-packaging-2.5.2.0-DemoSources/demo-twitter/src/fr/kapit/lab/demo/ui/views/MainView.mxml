@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:TemplateDemoContainer xmlns:components="fr.kapit.lab.demo.common.components.*"
+								  xmlns:fx="http://ns.adobe.com/mxml/2009"
+								  xmlns:info="fr.kapit.lab.demo.info.*"
+								  xmlns:layouts="fr.kapit.lab.demo.ui.components.layouts.*"
+								  xmlns:menubar="fr.kapit.lab.demo.ui.components.menubar.*"
+								  xmlns:mx="library://ns.adobe.com/flex/mx"
+								  xmlns:overview="fr.kapit.lab.demo.ui.components.overview.*"
+								  xmlns:panel="fr.kapit.lab.demo.panel.*"
+								  xmlns:s="library://ns.adobe.com/flex/spark"
+								  xmlns:twitter="fr.kapit.lab.demo.twitter.*"
+								  xmlns:util="fr.kapit.lab.demo.util.*"
+								  xmlns:visualizer="fr.kapit.visualizer.*"
+								  width="100%" height="100%"
+								  openOptions="true"
+								  showAboutInfo="this_showAboutInfoHandler(event)"
+								  title="Social Network"
+								  creationComplete="mainView_creationCompleteHandler(event)"
+								  currentState="normal"
+								  >
+	<fx:Declarations>
+		<twitter:TwitterManager id="twitterManager" mainView="{this}" />
+	</fx:Declarations>
+	<fx:Script>
+	<![CDATA[
+		import com.swfjunkie.tweetr.data.objects.SearchResultData;
+		
+		import flash.net.navigateToURL;
+		
+		import fr.kapit.lab.demo.model.ApplicationModel;
+		import fr.kapit.lab.demo.popup.ErrorPopupWithOption;
+		import fr.kapit.lab.demo.ui.renderers.TagRenderer;
+		import fr.kapit.lab.demo.ui.renderers.TweetRenderer;
+		import fr.kapit.layouts.algorithms.forcedirected.gem.StaticGEMLayout;
+		import fr.kapit.layouts.constants.RootSelectionType;
+		import fr.kapit.visualizer.base.ISprite;
+		import fr.kapit.visualizer.base.sprite.LightGenericSprite;
+		import fr.kapit.visualizer.base.uicomponent.GenericSprite;
+		import fr.kapit.visualizer.decorators.sprite.LightGenericSpriteDecorator;
+		import fr.kapit.visualizer.events.VisualizerEvent;
+		import fr.kapit.visualizer.renderers.DefaultTooltip;
+		import fr.kapit.visualizer.renderers.IRenderer;
+		
+		import mx.events.FlexEvent;
+		import mx.managers.PopUpManager;
+
+
+		/**
+		 * @private
+		 * Reference to the global application model.
+		 */
+		[Bindable]
+		private var _appModel:ApplicationModel = null;
+
+		/**
+		 * @private
+		 * Current ratio of the visualizer component.
+		 */
+		[Bindable]
+		private var _zoomRatio:Number = 1;
+
+		/**
+		 * @private
+		 * Instance of popup to display error on layouts
+		 */
+		private var _layoutErrorPopup:ErrorPopupWithOption;
+
+		/**
+		 * Invoked upon creation of the view.
+		 *
+		 * @param event
+		 */
+		protected function mainView_creationCompleteHandler(event:FlexEvent):void
+		{
+			if(!visualizer)
+				return;
+			appModel.visualizer = visualizer;
+			appModel.mainView = this;
+
+			visualizer.nodeTooltipRendererFunction = nodeToolTipRendererFunction;
+			visualizer.nodeRendererFunction = nodeRendererFunction;
+
+			appModel.visualizerModel.layoutID = StaticGEMLayout.ID;
+
+			appModel.visualizerModel.enableSelectionDrag = false;
+
+			// hide expand/collapse buttons
+			visualizer.setStyle("showNodeExpandCollapseButton", false);
+
+			visualizer.radialLayout.rootSelectionPolicy = RootSelectionType.MOST_SURROUNDED_ROOT_SELECTION;
+			visualizer.balloonLayout.rootSelectionPolicy = RootSelectionType.MOST_SURROUNDED_ROOT_SELECTION;
+
+			// Errors catching on layout failure
+			visualizer.addEventListener(VisualizerEvent.LAYOUT_FAILED, layoutFailedHandler);
+
+			// Used to synchronize the zoom ratio of the visualizer component and the overview component
+			visualizer.addEventListener(VisualizerEvent.GRAPH_FITTED, graphZoomedHandler);
+			visualizer.addEventListener(VisualizerEvent.GRAPH_ZOOMED, graphZoomedHandler);
+
+			visualizer.addEventListener(VisualizerEvent.ELEMENTS_DRAG_STARTED, elementDragStartedHandler);
+			visualizer.addEventListener(VisualizerEvent.ELEMENTS_DRAGGING, elementDragFinishedHandler);
+			visualizer.addEventListener(VisualizerEvent.ELEMENT_CLICKED, elementClickedHandler)
+
+			startTwitter();
+		}
+
+		/**
+		 *	Adds a tweet node to the graph and links it to the corresponding tag nodes.
+		 *
+		 * @param data the tweet data.
+		 * @param tags the list of the tags associated with the tweet.
+		 *
+		 * @return true if the graph has been modified by adding a node or a link.
+		 */
+		public function addTweet(data:SearchResultData, tags:Array):Boolean
+		{
+			if(!visualizer)
+				return false;
+			var changed:Boolean;
+			var tweetId:String = data.id.toString();
+			if (!visualizer.nodesMap[tweetId])
+			{
+				visualizer.addNodeElement(data, null, null, new Point(width*0.5, height*0.5), tweetId);
+				changed = true;
+			}
+
+			for each (var tag:String in tags)
+			{
+				if (addTag(tag, tweetId))
+				{
+					changed = true;
+				}
+			}
+
+			if (changed)
+			{
+				visualizer.reLayout();
+			}
+
+			return changed;
+		}
+
+		/**
+		 * Adds a tag node to the graph and links it to the corresponding tweet node.
+		 *
+		 * @param tag the name of the tag node
+		 * @param tweetId the id of the tweet node
+		 *
+		 * @return true if the graph has been modified by adding a node or a link.
+		 */
+		private function addTag(tag:String, tweetId:String):Boolean
+		{
+			if(!visualizer)
+				return false;
+			var changed:Boolean;
+			if (!visualizer.nodesMap[tag])
+			{
+				visualizer.addNodeElement({tag:tag}, null, null, new Point(width*0.5, height*0.5), tag);
+				changed = true;
+			}
+
+			if (addLink(tag, tweetId))
+			{
+				changed = true;
+			}
+
+			return changed;
+		}
+
+		/**
+		 * Adds a link from a tag node to a tweet node
+		 *
+		 * @param tag the name of the tag node
+		 * @param tweetId the id of the tweet node
+		 *
+		 * @return true if the graph has been modified by adding a link.
+		 */
+		private function addLink(tag:String, tweetId:String):Boolean
+		{
+			if(!visualizer)
+				return false;
+			var tagNode:ISprite = visualizer.nodesMap[tag];
+			var tweetNode:ISprite = visualizer.nodesMap[tweetId];
+
+			if (tagNode == null || tweetNode == null)
+			{
+				return false;
+			}
+
+			var linkId:String = tag + "->" + tweetId;
+
+			if (visualizer.linksMap[linkId])
+			{
+				return false;
+			}
+
+			visualizer.addLinkElement({id:linkId}, tagNode, tweetNode);
+
+			return true;
+		}
+
+		/**
+		 * Generates nodes labels.
+		 *
+		 * @param data node data
+		 *
+		 * @return an array containing the node labels.
+		 */
+		private function labelFunction(data:Object):Array
+		{
+			return data.hasOwnProperty("tag") ? [data.tag] : [];
+		}
+
+		private function treatData(data:Object):Object
+		{
+			if (data is SearchResultData)
+			{
+				var tweet:String = data.text;
+				if (tweet.length > 71)
+				{
+					data.text = tweet.substr(0,70) + '\n' + tweet.substr(71);
+				}
+			}
+			else if (data.hasOwnProperty("tag"))
+			{
+				data.text = "tag: "+data.tag;
+			}
+			return data;
+		}
+
+		/**
+		 * @private
+		 * Updates the current ratio
+		 *
+		 * @param event
+		 */
+		protected function graphZoomedHandler(event:VisualizerEvent):void
+		{
+			if(visualizer)
+				_zoomRatio = visualizer.ratio;
+		}
+
+		/**
+		 * @private
+		 * Handles an error when a layout failed
+		 *
+		 * @param event
+		 */
+		protected function layoutFailedHandler(event:VisualizerEvent):void
+		{
+			_layoutErrorPopup = PopUpManager.createPopUp(this, ErrorPopupWithOption, true) as ErrorPopupWithOption;
+			PopUpManager.centerPopUp(_layoutErrorPopup);
+			_layoutErrorPopup.title = "Error";
+			_layoutErrorPopup.showBtClose = false;
+			_layoutErrorPopup.errorLabel = "This graph cannot be processed with this layout";
+			_layoutErrorPopup.addEventListener(Event.CLOSE, closeErrorPopupHandler);
+		}
+
+		protected function closeErrorPopupHandler(event:Event):void
+		{
+			PopUpManager.removePopUp(_layoutErrorPopup);
+		}
+
+		/**
+		 * Reference to the global application model.
+		 */
+		[Bindable]
+		public function get appModel():ApplicationModel
+		{
+			return _appModel;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set appModel(objValue:ApplicationModel):void
+		{
+			if (appModel)
+			{
+				appModel.visualizer = null;
+			}
+			_appModel = objValue;
+			if (appModel && visualizer)
+			{
+				appModel.visualizer = visualizer;
+			}
+		}
+
+		/**
+		 * Function used to return custom visual content (MXML component, Video, Image..) for each node given its data.
+		 * The function takes as input the node data and according to it returns a custom <code>DisplayObject</code> instance.
+		 * It is called at rendering time for each node or when setting this property.
+		 *
+		 * @param data Object to set to the node
+		 */
+		protected function nodeRendererFunction(data:Object):DisplayObject
+		{
+			var renderer:IRenderer = (data is SearchResultData) ? new fr.kapit.lab.demo.ui.renderers.TweetRenderer() : new fr.kapit.lab.demo.ui.renderers.TagRenderer();
+			renderer.data = data;
+			return DisplayObject(renderer)
+		}
+
+		/**
+		 * Starts twitter requests by asking for the trending topics.
+		 */
+		protected function startTwitter():void
+		{
+			twitterManager.getTrends();
+		}
+
+		protected function this_showAboutInfoHandler(event:Event):void
+		{
+			aboutPanel.open = true;
+		}
+
+		private function nodeToolTipRendererFunction(data:Object):DisplayObject
+		{
+			var tooltip:DefaultTooltip = new DefaultTooltip();
+			tooltip.data = treatData(data);
+			tooltip.labelFields = ["text"];
+			return tooltip;
+		}
+
+		private var oldPosition:Point = new Point();
+		protected function elementDragStartedHandler(event:VisualizerEvent):void
+		{
+			isDisplacing = false;
+			var selectedItem:GenericSprite = event.items[0] as GenericSprite;
+			oldPosition = new Point(selectedItem.x,selectedItem.y)
+			//callLater(navigate,[selectedItem, p]);
+				
+			
+			
+		}
+		
+		[Bindable] private var isDisplacing:Boolean
+		
+		protected function elementDragFinishedHandler(event:VisualizerEvent):void
+		{
+			
+			var selectedItem:GenericSprite = event.items[0] as GenericSprite;
+			var newPosition:Point = new Point(selectedItem.x,selectedItem.y)
+			if ( Math.abs(newPosition.x - oldPosition.x) > 0 )
+				isDisplacing = true
+			if ( Math.abs(newPosition.y - oldPosition.y) > 0 )
+				isDisplacing = true
+			
+			
+		}
+		
+		protected function elementClickedHandler(event:VisualizerEvent):void
+		{
+			if (isDisplacing)
+				return;
+			var selectedItem:GenericSprite = event.items[0] as GenericSprite;
+			if (selectedItem && selectedItem.data.link)
+				navigateToURL(new URLRequest(selectedItem.data.link));
+		}
+		
+	]]>
+	</fx:Script>
+	<components:states>
+		<s:State name="noresult"/>
+		<s:State name="normal"/>
+	</components:states>
+	<components:optionsContent>
+		<overview:OverviewPanel appModel="{appModel}" ratio="{_zoomRatio}" />
+		<layouts:LayoutPanel id="layoutPanel" appModel="{appModel}" />
+	</components:optionsContent>
+
+	<visualizer:Visualizer id="visualizer" left="0" right="0" top="40" bottom="0"/>
+	<s:HGroup horizontalAlign="center" left="0" right="0" top="80" bottom="0" includeIn="noresult">
+		<s:Label text="{appModel.searchMessage}"
+			fontFamily="Calibri" fontSize="16" color="0x808080"/>
+	</s:HGroup>
+
+	<menubar:MenuBar id="menubar" width="100%" height="40" model="{_appModel}"/>
+
+	<fx:Declarations>
+		<components:AboutPanel id="aboutPanel"
+							   parentPopUp="{this}" title="About Kalileo Twitter Demo"
+							   >
+			<components:description>
+				<![CDATA[
+				<br/>This application uses Kalileo’s Visualizer component to display the relationships between tweets and tags.<br/>
+				<p>We can see that there are different tag clusters that contain related tags frequently used in the same tweets.
+				In addition, we can see near these tags a cloud of tweets relating to the same topics.</p>
+				<p>Starting from the top trending topic in Twitter, the application builds the graph by adding the
+				related tweets to that topic</p>.
+				<p>Then it adds the tags used in these tweets and the recent tweets related to these tags.</p>
+				<p>These steps are repeated until the graph reaches a fixed limit of nodes.</p>
+				<p>It is also possible to use the search field to visualize a similar graph for other topics.</p>
+				]]>
+			</components:description>
+		</components:AboutPanel>
+	</fx:Declarations>
+
+</components:TemplateDemoContainer>

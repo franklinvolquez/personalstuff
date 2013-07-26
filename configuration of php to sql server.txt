@@ -1,0 +1,47 @@
+niciado por ruxee Ver Mensaje
+Estuve buscando como conectarme al SQLServer 2008 R2 desde php y por mas que busque no encontré ningun post que ayudara y explicara. Finalmente luego de casi un dia logre hacerlo y comparto para que no pierdan mas tiempo. 
+
+Mi ambiente:
+XAMPP 2.5
+Windows Vista
+Microsoft SQL Server 2008 R2
+
+Pasos:
+Obtener el entorno bajo el cual esta funcionando mi servidor, para esto debo:
+Abrir mi PHP info en http://localhost/xampp/
+tomar nota del valor de Thread Safety, en mi caso =enabled
+Tomar el valor de la version de PHP, en mi caso 5.3.8
+Tomar el valor de Compiler, en mi caso VC9
+Descargar de Microsoft los drivers respectivos. Los podes hallar en http://www.microsoft.com/download/en....aspx?id=17308 Microsoft Drivers 3.0 for SQL Server for PHP CTP1.
+Instalar los drivers en el directorio donde esta xampp. En mi caso esta en c:/xampp/php/ext
+Luego buscar en esos directorios los archivos instalados, que debieran ser similares a php_sqlsrv_53_ts_vc9.dll donde:
+53 -> indica el version de mi PHP=5.3.x
+ts -> significa que el para entorno THREAD-SAFE=enabled
+vc9 -> indica que el compilador de mi PHP es VC9
+Entonces tomo nota del nombre del archivo correspondiente php_sqlsrv_53_ts_vc9.dll
+Editar el PHP.ini que en mi caso está en c:/xampp/php, donde:
+Busco el inicio del segmento Dynamic Extensions
+Al final del segmento, y antes del siguiente, agrego la extension de mi libreria, la cual quedaria extension=php_sqlsrv_53_ts_vc9.dll. Donde he usado el nombre del archivo instalado en el paso 4.
+Grabo el php.ini y lo cierro
+Detengo y reinicio mi servicio Apache
+
+A estas alturas ya cargo la libreria proporcionada por Microsoft y estamos listos para usar todos los comandos de conexion.
+
+Yo usé este script
+Código PHP:
+$serverName = "RUXEE-NOTEBOOK\SQLEXPRESS";  
+
+$connectionInfo = array( "Database"=>"ModFinPQP"); 
+$conn = sqlsrv_connect( $serverName, $connectionInfo); 
+
+if( $conn ) { 
+     echo "Conectado a la Base de Datos.<br />"; 
+}else{ 
+     echo "NO se puede conectar a la Base de Datos.<br />"; 
+     die( print_r( sqlsrv_errors(), true)); 
+}  
+Debido a que no indico usuario y password el conector se enlaza a la BD por medio de mi Windows Authentication, sino debera especificarse usuario y password con la misma sintaxis con la que esta $connectionInfo
+
+Me basé en la lectura del manual de PHP.net en http://www.php.net/manual/en/book.sqlsrv.php donde estan todas las funciones de este buenisimo driver.
+
+Espero les ayude, he tratado de explicarlo sin dejar lagunas.

@@ -1,0 +1,3 @@
+<add name="ConnectionString_DB_CENTROS" connectionString="Data Source=MSP-SQL-001;Initial Catalog=DB_CENTROS_SALUD; User Id=usrIntranetMSP; Password=u$r1ntr@n3tM$P"
+
+prueba con esta vista [VW_EST_CENTROS_SALUD_UNAPS_BI]

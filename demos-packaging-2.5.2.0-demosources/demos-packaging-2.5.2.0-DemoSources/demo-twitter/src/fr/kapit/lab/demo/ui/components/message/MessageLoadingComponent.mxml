@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 visible.loaded="true" visible.loading="true" visible.idle="false"
+		 creationComplete="this_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import flash.utils.setTimeout;
+			
+			import fr.kapit.visualizer.Visualizer;
+			import fr.kapit.visualizer.events.VisualizerEvent;
+			
+			import mx.controls.Text;
+			import mx.events.FlexEvent;
+			
+			protected var _timer:Timer;
+			protected var _dotsCount:uint;
+			
+
+			
+			[Bindable]
+			protected var messageText:String;
+			[Bindable]
+			protected var loadedMessageText:String;
+			
+			private var _loadingMessage:String;
+			[Bindable]
+			public function get loadingMessage():String
+			{
+				return _loadingMessage;
+			}
+			public function set loadingMessage(value:String):void
+			{
+				_loadingMessage = value;
+				_loadingStateChanged = true;
+				invalidateProperties();
+			}
+			
+			private var _loadedMessage:String;
+			[Bindable]
+			public function get loadedMessage():String
+			{
+				return _loadedMessage;
+			}
+			public function set loadedMessage(value:String):void
+			{
+				_loadedMessage = value;
+				_loadingStateChanged = true;
+				invalidateProperties();
+			}
+			protected var _loadingStateChanged:Boolean;
+			protected var _loadedLock:Boolean;
+			protected var  _loadingState:String;
+			[Bindable]
+			public function get loadingState():String
+			{
+				return _loadingState;
+			}
+			public function set loadingState(value:String):void
+			{
+				if(_loadingState == value)
+					return;
+				_loadingState = value;
+				if(_loadingState == 'loaded')
+				{
+					setTimeout(handleDataReceptionTimeOut,2000);
+					_loadedLock = true;
+				}
+				else if(_loadingState == 'idle')
+					_loadedLock = false;
+				_loadingStateChanged = true;
+				invalidateProperties();
+			}
+			
+			/* *******
+			* Overriden Methods
+			************/
+			
+			protected override function commitProperties():void
+			{
+				super.commitProperties();
+				if(_loadingStateChanged)
+				{
+					commitLoadingState();
+					_loadingStateChanged = false;
+				}
+			}
+			protected function commitLoadingState():void
+			{
+				if(!_timer)
+					return;
+				currentState = _loadedLock ? 'loaded' : _loadingState;
+				_dotsCount = 0;
+				_timer.stop();
+				if(_loadingState != 'idle')
+					_timer.start();
+				updateMessageText();
+			}
+			
+			/* *******
+			* Event Handlers
+			************/
+			
+			protected function this_creationCompleteHandler(event:FlexEvent):void
+			{
+				_timer = new Timer(500);
+				_timer.addEventListener(TimerEvent.TIMER,handleTimerUpdate);
+				loadingState = "idle";
+			}
+			protected function handleTimerUpdate(event:TimerEvent):void
+			{
+				updateMessageText();
+				_dotsCount ++;
+				_timer.stop();
+				if(_loadingState != 'idle')
+					_timer.start();
+				
+			}
+			protected function handleDataReceptionTimeOut():void
+			{
+				if(_loadedLock)
+				{
+					_loadedLock = false;
+					_loadingStateChanged = true;
+					invalidateProperties();
+				}
+			}
+			
+			/* *******
+			* Helper Methods
+			************/
+			
+			protected function updateMessageText():void
+			{
+				if(_loadingState == 'idle')
+					return;
+				if(_dotsCount>=4)
+					_dotsCount = 0;
+				var newText:String = (_loadingState == 'loading' && !_loadedLock) ? _loadingMessage : _loadedMessage;
+				for(var i:uint=0;i<_dotsCount;++i)
+					newText += '.';
+				messageText = newText;
+			}
+			
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="loading"/>
+		<s:State name="loaded"/>
+		<s:State name="idle"/>
+	</s:states>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:Label id="label" text="{messageText}" fontFamily="Calibri" fontSize="12" color="0x333333"/>
+</s:Group>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="2.0" viewHeight="99.5996" viewWidth="99.5996" ai:appVersion="15.0.2.399" ATE:version="1.0.0" flm:version="1.0.0" d:id="1" d:using="" xmlns="http://ns.adobe.com/fxg/2008" xmlns:ATE="http://ns.adobe.com/ate/2009" xmlns:ai="http://ns.adobe.com/ai/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt" xmlns:flm="http://ns.adobe.com/flame/2008">
+  <Library/>
+  <Group ai:artboardActive="1" ai:artboardIndex="0" ai:seqID="1" d:layerType="page" d:pageHeight="99.6" d:pageWidth="99.6" d:type="layer" d:userLabel="Artboard 1">
+    <Group ai:objID="1f849780" ai:seqID="2" d:id="2" d:type="layer" d:userLabel="Layer 1">
+      <Group ai:objID="2a5fcf00" ai:seqID="3" flm:knockout="false">
+        <Path x="9.5" y="9.5" winding="nonZero" ai:objID="29a6aa00" ai:seqID="5" data="M40.2471 80.4971C18.0547 80.4971 0 62.4414 0 40.2471 0 18.0547 18.0547 0 40.2471 0 62.4395 0 80.4941 18.0547 80.4941 40.2471 80.4941 62.4414 62.4395 80.4971 40.2471 80.4971Z">
+          <fill>
+            <LinearGradient x="40.2476" y="80.4971" scaleX="80.4966" rotation="270">
+              <GradientEntry ratio="0" color="#D6D8DB"/>
+              <GradientEntry ratio="0.668712" color="#FFFFFF"/>
+            </LinearGradient>
+          </fill>
+        </Path>
+        <Path x="9" y="9" winding="nonZero" ai:objID="29a69b00" ai:seqID="6" data="M40.7471 1C62.6641 1 80.4941 18.8306 80.4941 40.7471 80.4941 62.665 62.6641 80.4971 40.7471 80.4971 18.8306 80.4971 1 62.665 1 40.7471 1 18.8306 18.8306 1 40.7471 1M40.7471 0C18.2432 0 0 18.2412 0 40.7471 0 63.2559 18.2432 81.4971 40.7471 81.4971
+ 63.2529 81.4971 81.4941 63.2559 81.4941 40.7471 81.4941 18.2412 63.2529 0 40.7471 0L40.7471 0Z">
+          <fill>
+            <SolidColor color="#2385C0"/>
+          </fill>
+        </Path>
+      </Group>
+      <Path scaleY="0.99999" x="37.1943" y="67.3857" alpha="0.22" winding="nonZero" flm:variant="1" d:id="3" data="M9.6272 -13.0582 10.6002 -20.4834 15.9258 -20.4834 14.9529 -13.0582ZM7.88611 0 9.16632 -10.0369 14.492 -10.0369 13.1606 0 16.2331 0 17.5645 -10.0369 22.4293 -10.0369 22.4293 -13.0582 18.0254 -13.0582 18.9471 -20.4834 23.6071 -20.4834 23.6071 -23.5047
+ 19.408 -23.5047 20.6882 -33.2855 17.6669 -33.2855 16.3867 -23.5047 11.0098 -23.5047 12.3412 -33.2855 9.31995 -33.2855 7.98853 -23.5047 3.12372 -23.5047 3.12372 -20.4834 7.57886 -20.4834 6.6059 -13.0582 1.89471 -13.0582 1.89471 -10.0369 6.14502
+ -10.0369 4.8136 0Z">
+        <fill>
+          <SolidColor color="#989898"/>
+        </fill>
+      </Path>
+    </Group>
+  </Group>
+  <Private variant:using="" mngo:using="" xmlns:mngo="http://ns.adobe.com/flamingo/apd" xmlns:variant="http://ns.adobe.com/flame/2008/apd">
+    <mngo:VariantContent fpdNS="http://ns.adobe.com/flame/2008/apd" fpdPRE="variant" flm:hashcode="64571C716614BFCA6240BD3CA4D0DD36" flm:original="1" d:ref="#3">
+      <variant:RichText scaleY="0.99999" x="37.1943" y="67.3857" alpha="0.22" fontFamily="Arial" whiteSpaceCollapse="preserve" ai:aa="2" ai:objID="2a7ada00" ai:seqID="7" d:id="4">
+        <variant:content><variant:p fontFamily="Arial" d:id="5"><variant:span fontFamily="Arial" d:id="6">#</variant:span></variant:p></variant:content>
+      </variant:RichText>
+    </mngo:VariantContent>
+    <ai:PrivateElement d:ref="#1">
+      <ai:SaveOptions>
+        <ai:Dict data="B includeObjectOutsideArtboard 0 B writeImages 1 B includeSymbol 0 B aiEditCap 1 I versionKey 2 B includeXMP 0 I preserveGradientPolicy 3 I preserveTextPolicy 1 I preserveFilterPolicy 1 B downsampleLinkedImages 0 I rasterizeResolution 72 I expandBlendsOption 5 "/>
+      </ai:SaveOptions>
+      <ai:DocData base="Untitled-2.assets/images" globalOffsetH="248.188" globalOffsetV="-371.682" rulerCanvasDiffH="298.5" rulerCanvasDiffV="421.5">
+        <ai:DocRasterSettings>
+          <ai:Dict data="R padd 36 B mask 0 B spot 1 B alis 0 I dpi. 300 I colr 5 "/>
+        </ai:DocRasterSettings>
+      </ai:DocData>
+      <ai:AutoGenImageList>
+        <ai:Dict>
+          <ai:Entry name="0" value="Image_0001.png" valueType="U"/>
+        </ai:Dict>
+      </ai:AutoGenImageList>
+    </ai:PrivateElement>
+    <ai:PrivateElement flm:hashcode="FA75E869746348D4924B2A6A3E4A31A9" d:ref="#2">
+      <ai:LayerOptions color="5 79.31 257 128.502"/>
+    </ai:PrivateElement>
+    <ATE:ATEAttributes ATE:C_autoLeading="true" ATE:C_baseLine="normal" ATE:C_baselineShift="0" ATE:C_charRotation="0" ATE:C_color="#989898" ATE:C_fill="true" ATE:C_fillFirst="true" ATE:C_fillOverprint="false" ATE:C_fillVisible="true" ATE:C_font="DIN-Regular" ATE:C_fontCaps="normal" ATE:C_fontSize="51.211" ATE:C_horizontalScale="1.00001" ATE:C_kerning="metric" ATE:C_leading="61.4533" ATE:C_lineCapType="buttCap" ATE:C_lineDashOffset="0" ATE:C_lineJoinType="miterJoin" ATE:C_lineWidth="1" ATE:C_miterLimit="10" ATE:C_noBreak="false" ATE:C_strikethroughPos="off" ATE:C_stroke="false" ATE:C_strokeOverprint="false" ATE:C_strokeVisible="true" ATE:C_tracking="0" ATE:C_underlineOffset="0" ATE:C_underlinePos="off" ATE:C_verticalScale="1" ATE:JC_leftAki="-1" ATE:JC_rightAki="-1" ATE:JC_styleRunAlign="byRomanHori_centerVertical" ATE:JC_tusme="0" ATE:JO_japAltFeature="default" ATE:JO_kana="false" ATE:JO_language="UKEnglish" ATE:JO_proportionalMetrics="false" ATE:JO_romanItalics="false" ATE:JO_ruby="false" ATE:JP_autoTCY="0" ATE:JP_burasagariType="none" ATE:JP_hangingRoman="false" ATE:JP_kurikaeshiMojiShori="false" ATE:JP_leadingType="roman" ATE:MC_diacVPosition="openType" ATE:MC_diacXPos="0" ATE:MC_diacYPos="0" ATE:MC_digitSet="default" ATE:MC_directionOverride="default" ATE:MC_kashidas="default" ATE:MO_justificationAlt="false" ATE:MO_overlapSwash="false" ATE:MO_stretchedAlt="false" ATE:MP_justificationMethod="default" ATE:O_alternateLigatures="false" ATE:O_connectionForms="true" ATE:O_contextualLigatures="true" ATE:O_discretionaryLigatures="false" ATE:O_figureStyle="default" ATE:O_fontOTPos="normal" ATE:O_fractions="false" ATE:O_ligature="true" ATE:O_oldStyle="false" ATE:O_ordinals="false" ATE:O_ornaments="false" ATE:O_stylisticAlternates="false" ATE:O_swash="false" ATE:O_titling="false" ATE:P_autoHyphenate="true" ATE:P_autoLeadingPercentage="1.2" ATE:P_composerEngine="latinCJK" ATE:P_consecutiveHyphenLimit="0" ATE:P_defaultTabWidth="128.46" ATE:P_endIndent="0" ATE:P_everyLineComposer="false" ATE:P_firstlineIndent="0" ATE:P_glyphScaling="1" ATE:P_hyphenateCapitalized="true" ATE:P_hyphenatedWordSize="6" ATE:P_hyphenationPreference="0.5" ATE:P_hyphenationZone="36" ATE:P_letterSpacing="0" ATE:P_maxGlyphScaling="1" ATE:P_maxLetterSpacing="0" ATE:P_maxWordSpacing="1.33" ATE:P_minGlyphScaling="1" ATE:P_minLetterSpacing="0" ATE:P_minWordSpacing="0.8" ATE:P_paragraphDirection="ltr" ATE:P_postHyphenSize="2" ATE:P_preHyphenSize="2" ATE:P_singleWordJustif="fullJustifyLastLineFull" ATE:P_spaceAfter="0" ATE:P_spaceBefore="0" ATE:P_startIndent="0" ATE:P_textAlign="left" ATE:P_wordSpacing="1" ATE:TA_columnCount="1" ATE:TA_height="0" ATE:TA_lineOrientation="horiz" ATE:TA_spacing="0" ATE:TA_width="0" ATE:T_baselineDirection="withStream" ATE:T_leftRightAdjust="0" ATE:T_upDownAdjust="0" ATE:W_lineCount="2" ATE:W_lineGap="0" ATE:W_orphanAmount="2" ATE:W_scale="0.5" ATE:W_warichuEnabled="false" ATE:W_warichuJustification="autoJustify" ATE:W_widowAmount="2" flm:hashcode="0A3FEB765593B3E04F0B63D0CB34A13C" d:ref="#4"/>
+    <ATE:ATEAttributes ATE:C_kerning="metric" d:ref="#5"/>
+    <ATE:ATEAttributes ATE:C_kerning="metric" d:ref="#6"/>
+  </Private>
+</Graphic>

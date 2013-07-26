@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:OptionsPanel implements="fr.kapit.lab.demo.ui.components.IConfigPanel"
+						 xmlns:component="fr.kapit.lab.demo.panel.component.*"
+						 xmlns:components="fr.kapit.lab.demo.common.components.*"
+						 xmlns:forms="fr.kapit.lab.demo.forms.*"
+						 xmlns:fx="http://ns.adobe.com/mxml/2009"
+						 xmlns:mx="library://ns.adobe.com/flex/mx"
+						 xmlns:s="library://ns.adobe.com/flex/spark"
+						 skinClass="fr.kapit.lab.demo.common.skins.OptionsLayoutPanelSkin"
+						 width="100%"
+						 maxContentHeight="0" title="Layouts"
+						 collapsible="false"
+						 creationComplete="this_creationCompleteHandler(event)">
+
+	<fx:Library>
+		<fx:Definition name="HSeparator">
+			<s:Group width="100%" height="1">
+				<s:Rect left="0" right="0" top="0" bottom="0">
+					<s:fill>
+						<s:SolidColor color="0x919191" />
+					</s:fill>
+				</s:Rect>
+			</s:Group>
+		</fx:Definition>
+	</fx:Library>
+
+	<fx:Declarations>
+		<s:ArrayCollection id="layoutList">
+			<component:LayoutSelectorHeaderButton 
+												  icon="{EmbeddedAssets.IMG_LAYOUT_ORGANIC}"
+												  label="Organic"
+												  layoutType="{StaticGEMLayout.ID}"
+												  state="StaticGEMLayout"
+												  tooltip="Organic : StaticGEMLayout"
+												  />
+			<component:LayoutSelectorHeaderButton 
+												  icon="{EmbeddedAssets.IMG_LAYOUT_CIRCULAR}"
+												  label="Circular"
+												  layoutType="{SingleCycleCircularLayout.ID}"
+												  state="SingleCycleCircularLayout"
+												  tooltip="Circular : SingleCycleCircularLayout"
+												  />
+			<component:LayoutSelectorHeaderButton 
+												  icon="{EmbeddedAssets.IMG_LAYOUT_BALLOON}"
+												  label="Balloon"
+												  layoutType="{BalloonLayout.ID}"
+												  state="BalloonLayout"
+												  tooltip="Balloon : BalloonLayout"
+												  />
+			<component:LayoutSelectorHeaderButton 
+												  icon="{EmbeddedAssets.IMG_LAYOUT_RADIAL}"
+												  label="Radial"
+												  layoutType="{RadialLayout.ID}"
+												  state="RadialLayout"
+												  tooltip="Radial : RadialLayout"
+												  />
+		</s:ArrayCollection>
+
+
+	</fx:Declarations>
+
+	<fx:Script>
+	<![CDATA[
+		import fr.kapit.datavisualization.assets.EmbeddedAssets;
+		import fr.kapit.diagrammer.base.uicomponent.DiagramGroup;
+		import fr.kapit.diagrammer.base.uicomponent.container.DiagramTable;
+		import fr.kapit.lab.demo.model.ApplicationModel;
+		import fr.kapit.lab.demo.models.ILayoutModel;
+		import fr.kapit.lab.demo.popup.ErrorPopup;
+		import fr.kapit.layouts.algorithms.balloon.BalloonLayout;
+		import fr.kapit.layouts.algorithms.circular.SingleCycleCircularLayout;
+		import fr.kapit.layouts.algorithms.forcedirected.fade.ProgressiveFadeLayout;
+		import fr.kapit.layouts.algorithms.forcedirected.gem.StaticGEMLayout;
+		import fr.kapit.layouts.algorithms.hierarchical.HierarchicalLayout;
+		import fr.kapit.layouts.algorithms.orthogonal.OrthogonalLayout;
+		import fr.kapit.layouts.algorithms.radial.RadialLayout;
+		import fr.kapit.layouts.algorithms.sugiyama.SugiyamaLayout;
+		import fr.kapit.layouts.constants.EdgeDrawType;
+		import fr.kapit.layouts.constants.OrientationType;
+		import fr.kapit.layouts.constants.RootSelectionType;
+		import fr.kapit.visualizer.events.VisualizerEvent;
+
+		import mx.core.IFlexDisplayObject;
+		import mx.events.FlexEvent;
+		import mx.managers.PopUpManager;
+
+		import spark.events.IndexChangeEvent;
+
+		/**
+		 * @private
+		 * Reference to the application model.
+		 */
+		private var _applicationModel:ApplicationModel = null;
+
+		/**
+		 * @private
+		 * Instance of popup to display error on layouts
+		 */
+		private var _layoutErrorPopup:IFlexDisplayObject;
+
+		private var _lastSelectedLayout:int = 0;
+
+		/**
+		 * Reference to the current layoutModel; the layoutModel is a wrapper
+		 * around the visulizer.layout property
+		 */
+		public function get layoutModel():ILayoutModel
+		{
+			if (!appModel)
+			{
+				return null;
+			}
+			if (!appModel.visualizerModel)
+			{
+				return null;
+			}
+
+			return appModel.visualizerModel.layoutModel;
+		}
+
+		/**
+		 * Reference to the current application model.
+		 */
+		[Bindable]
+		public function get appModel():ApplicationModel
+		{
+			return _applicationModel;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set appModel(value:ApplicationModel):void
+		{
+			_applicationModel = value;
+		}
+
+		[Bindable]
+		public var enableControls:Boolean = true;
+
+		protected function layoutSelector_changeHandler(event:IndexChangeEvent =null):void
+		{
+			if (!appModel.visualizerModel)
+			{
+				return;
+			}
+
+			_lastSelectedLayout = layoutSelector.selectedIndex;
+
+			var selectorButton:LayoutSelectorHeaderButton = LayoutSelectorHeaderButton(layoutSelector.selectedItem);
+
+			currentState = selectorButton.state;
+
+			appModel.visualizerModel.layoutID = selectorButton.layoutType;
+			title= " Layouts: "+selectorButton.label;
+		}
+
+
+		protected function closeErrorPopupHandler(event:Event):void
+		{
+			PopUpManager.removePopUp(_layoutErrorPopup);
+			layoutSelector.selectedIndex = _lastSelectedLayout;
+		}
+		protected function this_creationCompleteHandler(event:FlexEvent):void
+		{
+			var selectorButton:LayoutSelectorHeaderButton = LayoutSelectorHeaderButton(layoutSelector.selectedItem);
+			title= " Layouts: "+ selectorButton.label;
+		}
+	]]>
+	</fx:Script>
+
+	<components:states>
+		<s:State name="StaticGEMLayout" />
+		<s:State name="SingleCycleCircularLayout" />
+		<s:State name="BalloonLayout" />
+		<s:State name="RadialLayout" />
+	</components:states>
+
+	<components:headerContent>
+		<s:Group verticalCenter="0">
+			<component:KapHeaderPanelButtonBar id="layoutSelector"
+											   dataProvider="{layoutList}"
+											   selectedIndex="0"
+											   requireSelection="true"
+											   horizontalCenter="2"
+											   change="layoutSelector_changeHandler(event)"
+											   />
+		</s:Group>
+	</components:headerContent>
+
+
+</components:OptionsPanel>
